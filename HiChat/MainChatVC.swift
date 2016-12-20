@@ -27,7 +27,7 @@ class MainChatVC: UIViewController {
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.delegate = self
         tableView.dataSource = self
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: cellID)
+        tableView.register(MessageCell.self, forCellReuseIdentifier: cellID)
         view.addSubview(tableView)
         
         let tvConstraints:[NSLayoutConstraint] = [
@@ -63,9 +63,9 @@ extension MainChatVC:UITableViewDataSource{
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: cellID, for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: cellID, for: indexPath) as! MessageCell
         let message = messages[indexPath.row].text
-        cell.textLabel?.text = message
+        cell.messageLbl.text = message
         return cell
     }
 

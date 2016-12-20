@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		36840DA61E09B41400832FA0 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36840DA51E09B41400832FA0 /* Extensions.swift */; };
 		36D8A9BC1E0654F8002154B5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36D8A9BB1E0654F8002154B5 /* AppDelegate.swift */; };
 		36D8A9BE1E0654F8002154B5 /* MainChatVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36D8A9BD1E0654F8002154B5 /* MainChatVC.swift */; };
 		36D8A9C11E0654F8002154B5 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 36D8A9BF1E0654F8002154B5 /* Main.storyboard */; };
@@ -17,6 +18,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		36840DA51E09B41400832FA0 /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		36D8A9B81E0654F8002154B5 /* HiChat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HiChat.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		36D8A9BB1E0654F8002154B5 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		36D8A9BD1E0654F8002154B5 /* MainChatVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainChatVC.swift; sourceTree = "<group>"; };
@@ -82,6 +84,7 @@
 			children = (
 				36D8A9CF1E065B75002154B5 /* Message.swift */,
 				36D8A9D11E065E59002154B5 /* MessageCell.swift */,
+				36840DA51E09B41400832FA0 /* Extensions.swift */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -159,6 +162,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				36840DA61E09B41400832FA0 /* Extensions.swift in Sources */,
 				36D8A9D01E065B75002154B5 /* Message.swift in Sources */,
 				36D8A9D21E065E59002154B5 /* MessageCell.swift in Sources */,
 				36D8A9BE1E0654F8002154B5 /* MainChatVC.swift in Sources */,
@@ -326,6 +330,7 @@
 				36D8A9CC1E0654F8002154B5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
