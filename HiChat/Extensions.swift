@@ -22,3 +22,25 @@ extension UIColor {
         self.init(red:(netHex >> 16) & 0xff, green:(netHex >> 8) & 0xff, blue:netHex & 0xff)
     }
 }
+
+
+extension UITableView{
+    
+    func scrollToTheBottom(){
+        
+        if self.numberOfSections > 1{
+        
+            let lastSection = self.numberOfSections - 1
+            let rowToScroll = IndexPath(row: self.numberOfRows(inSection: lastSection) - 1, section: lastSection)
+            self.scrollToRow(at: rowToScroll, at: .bottom, animated: true)
+        
+        }
+        
+        let rows = self.numberOfRows(inSection: 0)
+        if(rows > 0 && self.numberOfSections == 1){
+            let row = IndexPath(row: rows - 1, section:  0)
+            self.scrollToRow(at: row , at: .bottom, animated: true)
+        }
+    }
+    
+}

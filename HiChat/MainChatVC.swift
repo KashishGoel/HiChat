@@ -10,11 +10,13 @@ import UIKit
 
 class MainChatVC: UIViewController{
 
-    private let tableView = UITableView()
+    private let tableView = UITableView(frame: CGRect.zero, style: .grouped)
     private let newMsgTextView = UITextView()
     private var bottomConstraint:NSLayoutConstraint!
     
-    var messages = [Message]()
+    private var sections = [Date:[Message]]()
+    var dates = [Date]()
+    
     let cellID = "msgCell"
     
     let closeKeyBoardGesture = UITapGestureRecognizer()
@@ -39,6 +41,10 @@ class MainChatVC: UIViewController{
         NotificationCenter.default.removeObserver(self)
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        tableView.scrollToTheBottom()
+    }
+    
     func setupTableView(){
         
         tableView.translatesAutoresizingMaskIntoConstraints = false
@@ -47,6 +53,7 @@ class MainChatVC: UIViewController{
         tableView.register(MessageCell.self, forCellReuseIdentifier: cellID)
         tableView.estimatedRowHeight = 50
         tableView.separatorColor = UIColor.clear
+        tableView.backgroundColor = UIColor(netHex: 0xF1F1F1)
         view.addSubview(tableView)
         
         //Area at the bottom of the screen for sending messages
@@ -67,8 +74,14 @@ class MainChatVC: UIViewController{
         sendBtn.setContentHuggingPriority(251, for: .horizontal)
         sendBtn.setContentCompressionResistancePriority(251, for: .horizontal)
         sendBtn.setTitle("Send", for: .normal)
+        sendBtn.addTarget(self, action: #selector(MainChatVC.sendBtnPressed), for: .touchUpInside)
+        sendBtn.setTitleColor(UIColor.white, for: .normal)
+        sendBtn.backgroundColor = UIColor(netHex: 0x28B894)
         newMsgArea.addSubview(sendBtn)
-        
+        newMsgArea.layer.cornerRadius = 5
+        newMsgArea.layer.shadowRadius = 5
+        newMsgArea.layer.shadowColor = UIColor(netHex: 0x8e8e93).cgColor
+        newMsgArea.layer.shadowOffset = CGSize(width: 2, height: 4)
         //So we can move the new message field up when typing, otherwise it is covered by keyboard
         
         bottomConstraint = newMsgArea.bottomAnchor.constraint(equalTo: view.bottomAnchor)
@@ -100,13 +113,17 @@ class MainChatVC: UIViewController{
         
         NSLayoutConstraint.activate(tvConstraints)
         var inc = true
-        
+        var date = Date(timeIntervalSince1970: 10000000)
         for i in 0...10{
             let msg = Message()
             msg.text = "\(i) This is a longer message. How does it look?"
             msg.incoming = inc
+            msg.timestamp = date
             inc = !inc
-            messages.append(msg)
+            if i%2 == 0 {
+            date = Date(timeInterval: 60*60*24, since: date)
+            }
+            addMessages(message: msg)
         }
         
 
@@ -128,30 +145,129 @@ class MainChatVC: UIViewController{
                 self.view.layoutIfNeeded()
             })
         }
+        tableView.scrollToTheBottom()
     }
+    
+    
+    func sendBtnPressed(){
+        
+        guard let text = newMsgTextView.text,text.characters.count > 0 else{return}
+        let message = Message()
+        message.text = text
+        message.incoming = false
+        message.timestamp = Date()
+        addMessages(message: message)
+        newMsgTextView.text = ""
+        tableView.reloadData()
+        tableView.scrollToTheBottom()
+    }
+    
     
     func closeKeyboard(){
     
         self.view.endEditing(true)
         
     }
+    
+    func addMessages(message:Message){
+        guard let date = message.timestamp else{return}
+        
+        let calendar = Calendar.current
+        let start = calendar.startOfDay(for: date)
+        
+        var msgs = sections[start]
+        
+        if (msgs?.count == 0 || msgs == nil){
+            dates.append(start)
+            msgs = [Message]()
+        }
+        
+        msgs?.append(message)
+        
+        sections[start] = msgs
+
+    }
+    
+    func retrieveMessages(section:Int)->[Message]{
+        let date = dates[section]
+        return sections[date]!
+    }
+    
 
 }
 
 extension MainChatVC:UITableViewDataSource{
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return messages.count
+        return retrieveMessages(section: section).count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellID, for: indexPath) as! MessageCell
-        let message = messages[indexPath.row]
+        let message = retrieveMessages(section: indexPath.section)[indexPath.row]
         cell.messageLbl.text = message.text
         cell.incoming(incoming: message.incoming)
+        cell.backgroundColor = UIColor.clear
         return cell
     }
 
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return dates.count
+    }
+    
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let view = UIView()
+        view.backgroundColor = UIColor.clear
+        let paddingView = UIView()
+        view.addSubview(paddingView)
+        paddingView.translatesAutoresizingMaskIntoConstraints = false
+        let dayLabel = UILabel()
+        dayLabel.translatesAutoresizingMaskIntoConstraints = false
+        dayLabel.textColor = UIColor(netHex: 0xF1F1F1)
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM dd, YYYY"
+        
+        let day = formatter.string(from: dates[section])
+        
+        dayLabel.text = day
+        
+        paddingView.addSubview(dayLabel)
+        paddingView.layer.cornerRadius = 10
+        paddingView.layer.masksToBounds = true
+        paddingView.backgroundColor = UIColor(netHex: 0x4682b4)
+        
+        let constraints:[NSLayoutConstraint] = [
+            paddingView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            paddingView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            paddingView.heightAnchor.constraint(equalTo: dayLabel.heightAnchor, constant: -5),
+            paddingView.widthAnchor.constraint(equalTo: dayLabel.widthAnchor, constant: 10),
+            
+            dayLabel.centerXAnchor.constraint(equalTo: paddingView.centerXAnchor),
+            dayLabel.centerYAnchor.constraint(equalTo: paddingView.centerYAnchor),
+
+            view.heightAnchor.constraint(equalTo: paddingView.heightAnchor)
+            ]
+        
+        NSLayoutConstraint.activate(constraints)
+        
+
+        
+        
+        
+        return view
+    }
+    
+    func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        return UIView()
+    }
+    
+    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        return 0.1
+    }
+    
+//    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+//        return 10
+//    }
 }
 
 extension MainChatVC:UITableViewDelegate{
